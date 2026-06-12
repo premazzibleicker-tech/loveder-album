@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>洛夫德锁业电子画册</title>
+  <style>
+    :root {
+      --ink: #f6f2e9;
+      --muted: #9e9b94;
+      --red: #c81018;
+      --panel: rgba(12, 13, 15, 0.86);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      background: #090a0c;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(200, 16, 24, 0.15), transparent 28%),
+        linear-gradient(135deg, #181a1e 0%, #050506 65%);
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 58px minmax(0, 1fr) 92px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 18px;
+      background: var(--panel);
+      border-bottom: 1px solid rgba(255,255,255,.09);
+      backdrop-filter: blur(16px);
+      z-index: 5;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+
+    .brand-mark {
+      width: 10px;
+      height: 30px;
+      border-radius: 2px;
+      background: var(--red);
+      box-shadow: 0 0 20px rgba(200,16,24,.55);
+    }
+
+    .brand span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .actions { display: flex; gap: 8px; }
+
+    button {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      padding: 9px 14px;
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      transition: background .18s ease, transform .18s ease;
+    }
+
+    button:hover { background: rgba(255,255,255,.13); transform: translateY(-1px); }
+
+    .viewer {
+      position: relative;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px 76px;
+      overflow: hidden;
+    }
+
+    .page-shell {
+      position: relative;
+      width: min(100%, 1100px);
+      height: 100%;
+      display: grid;
+      place-items: center;
+      perspective: 1500px;
+    }
+
+    .page {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      background: #111;
+      box-shadow: 0 28px 70px rgba(0,0,0,.58), 0 0 0 1px rgba(255,255,255,.08);
+      transform-origin: center;
+      animation: reveal .38s cubic-bezier(.2,.75,.2,1);
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    @keyframes reveal {
+      from { opacity: 0; transform: rotateY(4deg) scale(.985); }
+      to { opacity: 1; transform: rotateY(0) scale(1); }
+    }
+
+    .nav {
+      position: absolute;
+      top: 50%;
+      translate: 0 -50%;
+      width: 48px;
+      height: 66px;
+      padding: 0;
+      border-radius: 12px;
+      font-size: 32px;
+      background: rgba(8,8,9,.64);
+      z-index: 3;
+    }
+
+    .nav.prev { left: 16px; }
+    .nav.next { right: 16px; }
+
+    .counter {
+      position: absolute;
+      right: 20px;
+      bottom: 14px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.62);
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .strip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 16px;
+      overflow-x: auto;
+      background: var(--panel);
+      border-top: 1px solid rgba(255,255,255,.09);
+      scrollbar-width: thin;
+    }
+
+    .thumb {
+      flex: 0 0 auto;
+      width: 58px;
+      height: 70px;
+      padding: 3px;
+      border-radius: 6px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      overflow: hidden;
+    }
+
+    .thumb.active {
+      border-color: var(--red);
+      box-shadow: 0 0 0 2px rgba(200,16,24,.35);
+    }
+
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    @media (max-width: 720px) {
+      .app { grid-template-rows: 52px minmax(0, 1fr) 78px; }
+      .toolbar { padding: 0 10px; }
+      .brand { font-size: 14px; }
+      .actions button { padding: 8px 10px; font-size: 12px; }
+      .viewer { padding: 12px 46px; }
+      .nav { width: 38px; height: 54px; font-size: 27px; }
+      .nav.prev { left: 4px; }
+      .nav.next { right: 4px; }
+      .thumb { width: 48px; height: 58px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <header class="toolbar">
+      <div class="brand"><i class="brand-mark"></i><span>洛夫德锁业电子画册</span></div>
+      <div class="actions">
+        <button id="firstBtn" type="button">首页</button>
+        <button id="fullscreenBtn" type="button">全屏</button>
+      </div>
+    </header>
+
+    <section class="viewer">
+      <button class="nav prev" id="prevBtn" type="button" aria-label="上一页">‹</button>
+      <div class="page-shell">
+        <img class="page" id="pageImage" src="01.png" alt="画册第 1 页">
+        <span class="counter" id="counter">1 / 17</span>
+      </div>
+      <button class="nav next" id="nextBtn" type="button" aria-label="下一页">›</button>
+    </section>
+
+    <nav class="strip" id="strip" aria-label="页面缩略图"></nav>
+  </main>
+
+  <script>
+    const pages = [
+      "01.png",
+      ...Array.from({ length: 16 }, (_, index) => `${String(index + 2).padStart(2, "0")}.webp`)
+    ];
+
+    const image = document.getElementById("pageImage");
+    const counter = document.getElementById("counter");
+    const strip = document.getElementById("strip");
+    let current = 0;
+
+    pages.forEach((src, index) => {
+      const button = document.createElement("button");
+      button.className = "thumb";
+      button.type = "button";
+      button.title = `第 ${index + 1} 页`;
+      button.innerHTML = `<img src="${src}" alt="第 ${index + 1} 页缩略图">`;
+      button.addEventListener("click", () => showPage(index));
+      strip.appendChild(button);
+    });
+
+    function showPage(index) {
+      current = (index + pages.length) % pages.length;
+      image.classList.remove("page");
+      void image.offsetWidth;
+      image.src = pages[current];
+      image.alt = `画册第 ${current + 1} 页`;
+      image.classList.add("page");
+      counter.textContent = `${current + 1} / ${pages.length}`;
+
+      document.querySelectorAll(".thumb").forEach((thumb, thumbIndex) => {
+        thumb.classList.toggle("active", thumbIndex === current);
+      });
+      document.querySelectorAll(".thumb")[current]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      history.replaceState(null, "", `#p=${current + 1}`);
+    }
+
+    document.getElementById("prevBtn").addEventListener("click", () => showPage(current - 1));
+    document.getElementById("nextBtn").addEventListener("click", () => showPage(current + 1));
+    document.getElementById("firstBtn").addEventListener("click", () => showPage(0));
+    document.getElementById("fullscreenBtn").addEventListener("click", async () => {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.getElementById("app").requestFullscreen();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "ArrowLeft") showPage(current - 1);
+      if (event.key === "ArrowRight" || event.key === " ") showPage(current + 1);
+      if (event.key === "Home") showPage(0);
+    });
+
+    const requestedPage = Number(location.hash.match(/p=(\d+)/)?.[1] || 1);
+    showPage(Math.min(Math.max(requestedPage, 1), pages.length) - 1);
+  </script>
+</body>
+</html>
